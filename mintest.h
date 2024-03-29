@@ -95,11 +95,13 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
     } while (0)
 
 /* 打印测试相关统计计数，包括测试用例的执行总数、通过数、失败数 */
-#define MT_REPORT_COUNT()                                                            \
-    do                                                                               \
-    {                                                                                \
-        printf("!!! TEST COUNT: total %d test cases, %d passed, %d failed!\n",       \
-               __mt_test_count, __mt_test_count - __mt_fail_count, __mt_fail_count); \
+#define MT_REPORT_COUNT()                                                             \
+    do                                                                                \
+    {                                                                                 \
+        printf("!!! ==========================================================\n");   \
+        printf("!!! TEST COUNT: total %d test cases, %d passed, %d failed!\n",        \
+               __mt_test_count, __mt_test_count - __mt_fail_count, __mt_fail_count);  \
+        printf("!!! ==========================================================\n\n"); \
     } while (0)
 
 /* 条件检查断言，在condition条件不为真时测试失败，结束当前测试用例并基于message信息生成提示消息 */
