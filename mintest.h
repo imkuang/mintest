@@ -13,11 +13,12 @@
 #include <string.h>
 #include <math.h>
 
-/* 定义单个测试用例可缓存的消息数量（每个assert检查失败会缓存一条消息）和单条消息最大长度 */
+/* 定义单个测试用例可缓存的消息数量（每个assert失败会缓存一条消息，在测试用例结束后统一输出） */
 /* 用户可通过在引用该头文件前先定义对应宏来覆盖当前的默认值 */
 #ifndef MT_MESSAGE_MAX_NUM
 #define MT_MESSAGE_MAX_NUM (8)
 #endif
+/* 定义单条消息最大长度，用户可自定义覆盖当前默认值 */
 #ifndef MT_MESSAGE_MAX_LEN
 #define MT_MESSAGE_MAX_LEN (256)
 #endif
