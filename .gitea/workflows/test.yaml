@@ -1,0 +1,16 @@
+name: build & test
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: linux-generic
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Build example code
+        run: gcc -o mintest_example mintest_example.c
+      - name: Test example code
+        run: |
+          ./mintest_example
+          echo "mintest_example exit code: $?"
