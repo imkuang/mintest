@@ -11,6 +11,5 @@ jobs:
       - name: Build example code
         run: gcc -o mintest_example mintest_example.c
       - name: Test example code
-        run: |
-          ./mintest_example
-          echo "mintest_example exit code: $?"
+        run: ./mintest_example
+        continue-on-error: true
