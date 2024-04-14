@@ -10,6 +10,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Build example code
         run: gcc -o mintest_example mintest_example.c
-      - name: Test example code (will fail)
-        run: ./mintest_example
-        continue-on-error: true
+      - name: Test example code
+        run: sh mintest_example_test.sh
