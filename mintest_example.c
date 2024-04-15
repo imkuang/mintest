@@ -94,7 +94,7 @@ MT_TESTCASE(test_assert_string_eq_fail)
     mt_assert_string_eq("hello world", test_string);   /* FAIL */
 }
 
-/* 组合上述一系列测试用例，定义测试套件test_suite1 */
+/* 组合上述一系列测试用例，定义基础测试套件test_suite1 */
 MT_TESTSUITE(test_suite1)
 {
     /* 配置用例的准备和清理函数 */
@@ -122,10 +122,43 @@ MT_TESTSUITE(test_suite2)
     MT_RUN_TESTCASE(test_assert_int_eq_pass); /* 预期失败，因为test_int_value初始值为4 */
 }
 
+/* 定义测试用例test_assert_int_array_eq_pass，验证mt_assert_int_array_eq断言测试成功的场景 */
+MT_TESTCASE(test_assert_int_array_eq_pass)
+{
+    int a[] = {1, 2, 3};
+    int b[] = {1, 2, 3};
+    mt_assert_int_array_eq(a, 3, b, 3); /* PASS */
+}
+
+/* 定义测试用例test_assert_int_array_eq_fail1，验证mt_assert_int_array_eq断言数组长度不匹配测试失败的场景 */
+MT_TESTCASE(test_assert_int_array_eq_fail1)
+{
+    int a[] = {1, 2, 3};
+    int b[] = {1, 2};
+    mt_assert_int_array_eq(a, 3, b, 2); /*FAIL*/
+}
+
+/* 定义测试用例test_assert_int_array_eq_fail2，验证mt_assert_int_array_eq断言数组元素不匹配测试失败的场景 */
+MT_TESTCASE(test_assert_int_array_eq_fail2)
+{
+    int a[] = {1, 2, 3};
+    int b[] = {1, 2, 4};
+    mt_assert_int_array_eq(a, 3, b, 3); /*FAIL*/
+}
+
+/* 组合上述一系列测试用例，定义测试套件test_suite3，验证数组比较相关断言接口使用 */
+MT_TESTSUITE(test_suite3)
+{
+    MT_RUN_TESTCASE(test_assert_int_array_eq_pass);
+    MT_RUN_TESTCASE(test_assert_int_array_eq_fail1);
+    MT_RUN_TESTCASE(test_assert_int_array_eq_fail2);
+}
+
 int main(void)
 {
     MT_RUN_TESTSUITE(test_suite1); /* 运行测试套件test_suite1 */
     MT_RUN_TESTSUITE(test_suite2); /* 运行测试套件test_suite2 */
+    MT_RUN_TESTSUITE(test_suite3); /* 运行测试套件test_suite3 */
     MT_REPORT_COUNT();             /* 打印所有用例测试结果的计数统计 */
     return MT_EXIT_CODE;
 }

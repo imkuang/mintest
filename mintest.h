@@ -118,7 +118,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
         }                                                          \
     } while (0)
 
-/* 整数类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成提示消息 */
+/* 整数类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成固定格式的提示消息 */
 #define mt_assert_int_eq(expected, result)                                  \
     do                                                                      \
     {                                                                       \
@@ -134,7 +134,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
         }                                                                   \
     } while (0)
 
-/* 浮点数类型结果检查，期望结果与实际结果的差值大于判定精度时测试失败，结束当前测试用例并并生成提示消息 */
+/* 浮点数类型结果检查，期望结果与实际结果的差值大于判定精度时测试失败 */
 #define mt_assert_double_eq(expected, result)                                       \
     do                                                                              \
     {                                                                               \
@@ -152,12 +152,12 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
         }                                                                           \
     } while (0)
 
-/* 字符串类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成提示消息 */
+/* 字符串类型结果检查，期望结果与实际结果不相等时测试失败 */
 #define mt_assert_string_eq(expected, result)                                       \
     do                                                                              \
     {                                                                               \
-        const char *tmp_e = expected ? expected : "<null pointer>";                 \
-        const char *tmp_r = result ? result : "<null pointer>";                     \
+        const char *tmp_e = (expected) ? (expected) : "<null pointer>";             \
+        const char *tmp_r = (result) ? (result) : "<null pointer>";                 \
         if (0 != strcmp(tmp_e, tmp_r))                                              \
         {                                                                           \
             (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                  \
@@ -166,6 +166,36 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             __mt_test_status = 1;                                                   \
             return;                                                                 \
         }                                                                           \
+    } while (0)
+
+/* 整型数组结果检查，期望结果与实际结果的长度不相等或者对应元素不相等时测试失败 */
+#define mt_assert_int_array_eq(expected, expected_len, result, result_len)              \
+    do                                                                                  \
+    {                                                                                   \
+        int *tmp_e = (expected);                                                        \
+        int *tmp_r = (result);                                                          \
+        int tmp_e_len = (expected_len);                                                 \
+        int tmp_r_len = (result_len);                                                   \
+        int i = 0;                                                                      \
+        if (tmp_e_len != tmp_r_len)                                                     \
+        {                                                                               \
+            (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                      \
+                           "%s:%d: expected array length: %d, actual array length: %d", \
+                           __FILE__, __LINE__, tmp_e_len, tmp_r_len);                   \
+            __mt_test_status = 1;                                                       \
+            return;                                                                     \
+        }                                                                               \
+        for (i = 0; i < tmp_e_len; i++)                                                 \
+        {                                                                               \
+            if (tmp_e[i] != tmp_r[i])                                                   \
+            {                                                                           \
+                (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                  \
+                               "%s:%d: expected array[%d]: %d, actual array[%d]: %d",   \
+                               __FILE__, __LINE__, i, tmp_e[i], i, tmp_r[i]);           \
+                __mt_test_status = 1;                                                   \
+                return;                                                                 \
+            }                                                                           \
+        }                                                                               \
     } while (0)
 
 #endif /* __MINTEST_H__ */
