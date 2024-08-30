@@ -24,9 +24,9 @@
 #endif
 
 /* 测试用例执行的相关统计和状态记录 */
-static int __mt_test_count = 0;  /* 已执行的测试用例数 */
-static int __mt_fail_count = 0;  /* 失败的测试用例数 */
-static int __mt_test_status = 0; /* 临时记录测试用例执行状态（0:成功 / 1:失败） */
+static int __mt_testcase_total_count = 0; /* 已执行的测试用例总数 */
+static int __mt_testcase_fail_count = 0;  /* 执行失败的测试用例数 */
+static int __mt_testcase_run_status = 0;  /* 临时记录当前测试用例执行状态（0:成功 / 1:失败） */
 
 /* 测试用例的前置准备工作和清理工作接口函数指针，分别在测试逻辑执行前和执行后被调用 */
 /* 同一测试套件内的所有测试用例共用同一套准备和清理接口 */
@@ -43,7 +43,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
     static void __mt_testsuite_##suite_name(void)
 
 /* 使用测试失败的用例数作为测试结束的退出状态码，没有失败用例时为0，即测试成功 */
-#define MT_EXIT_CODE __mt_fail_count
+#define MT_EXIT_CODE __mt_testcase_fail_count
 
 /* 配置测试套件中用例的的setup和teardown接口函数，二者分别在每个用例开始前和结束后执行 */
 #define MT_TESTSUITE_CONFIGURE(setup_fn, teardown_fn) \
@@ -74,12 +74,12 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             (*__mt_setup_testcase)();                      \
         }                                                  \
         memset(__mt_message_cache, 0, MT_MESSAGE_MAX_LEN); \
-        __mt_test_status = 0;                              \
+        __mt_testcase_run_status = 0;                      \
         __mt_testcase_##testcase();                        \
-        __mt_test_count++;                                 \
-        if (__mt_test_status)                              \
+        __mt_testcase_total_count++;                       \
+        if (__mt_testcase_run_status)                      \
         {                                                  \
-            __mt_fail_count++;                             \
+            __mt_testcase_fail_count++;                    \
             printf("[F] %s failed:\n", #testcase);         \
             printf("    %s\n", __mt_message_cache);        \
         }                                                  \
@@ -100,7 +100,9 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
     {                                                                                 \
         printf("!!! ==========================================================\n");   \
         printf("!!! TEST COUNT: total %d test cases, %d passed, %d failed!\n",        \
-               __mt_test_count, __mt_test_count - __mt_fail_count, __mt_fail_count);  \
+               __mt_testcase_total_count,                                             \
+               __mt_testcase_total_count - __mt_testcase_fail_count,                  \
+               __mt_testcase_fail_count);                                             \
         printf("!!! ==========================================================\n\n"); \
     } while (0)
 
@@ -113,10 +115,24 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN, \
                            "%s:%d: %s",                            \
                            __FILE__, __LINE__, message);           \
-            __mt_test_status = 1;                                  \
+            __mt_testcase_run_status = 1;                          \
             return;                                                \
         }                                                          \
     } while (0)
+
+/* 指针判空断言，在pointer指针为NULL时测试失败，结束当前测试用例并生成固定格式的提示消息 */
+#define mt_assert_not_null(pointer)                                \
+    do                                                             \
+    {                                                              \
+        if (NULL == (pointer))                                     \
+        {                                                          \
+            (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN, \
+                           "%s:%d: %s should not be NULL",         \
+                           __FILE__, __LINE__, #pointer);          \
+            __mt_testcase_run_status = 1;                          \
+            return;                                                \
+        }                                                          \
+    } while (0);
 
 /* 整数类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成固定格式的提示消息 */
 #define mt_assert_int_eq(expected, result)                                  \
@@ -129,7 +145,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,          \
                            "%s:%d: expected result: %d, actual result: %d", \
                            __FILE__, __LINE__, tmp_e, tmp_r);               \
-            __mt_test_status = 1;                                           \
+            __mt_testcase_run_status = 1;                                   \
             return;                                                         \
         }                                                                   \
     } while (0)
@@ -147,7 +163,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
                            "%s:%d: expected result: %.*g, actual result: %.*g",     \
                            __FILE__, __LINE__,                                      \
                            significant_figures, tmp_e, significant_figures, tmp_r); \
-            __mt_test_status = 1;                                                   \
+            __mt_testcase_run_status = 1;                                           \
             return;                                                                 \
         }                                                                           \
     } while (0)
@@ -163,7 +179,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                  \
                            "%s:%d: expected result: \"%s\", actual result: \"%s\"", \
                            __FILE__, __LINE__, tmp_e, tmp_r);                       \
-            __mt_test_status = 1;                                                   \
+            __mt_testcase_run_status = 1;                                           \
             return;                                                                 \
         }                                                                           \
     } while (0)
@@ -182,7 +198,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                      \
                            "%s:%d: expected array length: %d, actual array length: %d", \
                            __FILE__, __LINE__, tmp_e_len, tmp_r_len);                   \
-            __mt_test_status = 1;                                                       \
+            __mt_testcase_run_status = 1;                                               \
             return;                                                                     \
         }                                                                               \
         for (i = 0; i < tmp_e_len; i++)                                                 \
@@ -192,7 +208,7 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
                 (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,                  \
                                "%s:%d: expected array[%d]: %d, actual array[%d]: %d",   \
                                __FILE__, __LINE__, i, tmp_e[i], i, tmp_r[i]);           \
-                __mt_test_status = 1;                                                   \
+                __mt_testcase_run_status = 1;                                           \
                 return;                                                                 \
             }                                                                           \
         }                                                                               \
