@@ -9,9 +9,9 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Checkout repo code
         uses: actions/checkout@v4
       - name: Build example code
-        run: gcc -o mintest_example mintest_example.c
+        run: make build
       - name: Test example code
-        run: sh mintest_example_test.sh
+        run: make test
