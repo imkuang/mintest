@@ -68,7 +68,6 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
 #define MT_RUN_TESTCASE(testcase)                          \
     do                                                     \
     {                                                      \
-        int i = 0;                                         \
         if (__mt_setup_testcase)                           \
         {                                                  \
             (*__mt_setup_testcase)();                      \
