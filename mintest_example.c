@@ -49,22 +49,6 @@ MT_TESTCASE(test_assert_fail)
     mt_assert(my_add_int(1, 1) == 3, "my_add_int(1, 1) calc result should be 5"); /* NOT RUN */
 }
 
-/* 定义测试用例test_assert_not_null_pass，验证mt_assert_not_null断言测试成功的场景 */
-MT_TESTCASE(test_assert_not_null_pass)
-{
-    int *p = (int *)malloc(sizeof(int));
-    mt_assert_not_null(p);
-    free(p);
-}
-
-/* 定义测试用例test_assert_not_null_fail，验证mt_assert_not_null断言测试失败的场景 */
-MT_TESTCASE(test_assert_not_null_fail)
-{
-    int *p = NULL;
-    mt_assert_not_null(p);
-    *p = 1; /* NOT RUN */
-}
-
 /* 定义测试用例test_assert_int_eq_pass，验证mt_assert_int_eq断言测试成功的场景 */
 MT_TESTCASE(test_assert_int_eq_pass)
 {
@@ -119,8 +103,6 @@ MT_TESTSUITE(test_suite1)
     /* 依次运行每个测试用例 */
     MT_RUN_TESTCASE(test_assert_pass);
     MT_RUN_TESTCASE(test_assert_fail);
-    MT_RUN_TESTCASE(test_assert_not_null_pass);
-    MT_RUN_TESTCASE(test_assert_not_null_fail);
     MT_RUN_TESTCASE(test_assert_int_eq_pass);
     MT_RUN_TESTCASE(test_assert_int_eq_fail);
     MT_RUN_TESTCASE(test_assert_double_eq_pass);
@@ -172,11 +154,56 @@ MT_TESTSUITE(test_suite3)
     MT_RUN_TESTCASE(test_assert_int_array_eq_fail2);
 }
 
+/* 定义测试用例test_assert_not_null_pass，验证mt_assert_not_null断言测试成功的场景 */
+MT_TESTCASE(test_assert_not_null_pass)
+{
+    int *p = (int *)malloc(sizeof(int));
+    mt_assert_not_null(p);
+    free(p);
+}
+
+/* 定义测试用例test_assert_not_null_fail，验证mt_assert_not_null断言测试失败的场景 */
+MT_TESTCASE(test_assert_not_null_fail)
+{
+    int *p = NULL;
+    mt_assert_not_null(p);
+    *p = 1; /* NOT RUN */
+}
+
+/* 定义测试用例test_assert_pointer_eq_pass，验证mt_assert_pointer_eq断言测试成功的场景 */
+MT_TESTCASE(test_assert_pointer_eq_pass)
+{
+    int *p1 = (int *)malloc(sizeof(int));
+    int *p2 = p1;
+    mt_assert_pointer_eq(p1, p2);
+    free(p1);
+}
+
+/* 定义测试用例test_assert_pointer_eq_fail，验证mt_assert_pointer_eq断言测试失败的场景 */
+MT_TESTCASE(test_assert_pointer_eq_fail)
+{
+    int *p1 = (int *)malloc(sizeof(int));
+    int *p2 = (int *)malloc(sizeof(int));
+    mt_assert_pointer_eq(p1, p2);
+    free(p1);
+    free(p2);
+}
+
+/* 组合上述一系列测试用例，定义测试套件test_suite4，验证指针比较相关断言接口使用 */
+MT_TESTSUITE(test_suite4)
+{
+    MT_RUN_TESTCASE(test_assert_not_null_pass);
+    MT_RUN_TESTCASE(test_assert_not_null_fail);
+    MT_RUN_TESTCASE(test_assert_pointer_eq_pass);
+    MT_RUN_TESTCASE(test_assert_pointer_eq_fail);
+}
+
 int main(void)
 {
     MT_RUN_TESTSUITE(test_suite1); /* 运行测试套件test_suite1 */
     MT_RUN_TESTSUITE(test_suite2); /* 运行测试套件test_suite2 */
     MT_RUN_TESTSUITE(test_suite3); /* 运行测试套件test_suite3 */
+    MT_RUN_TESTSUITE(test_suite4); /* 运行测试套件test_suite4 */
     MT_REPORT_COUNT();             /* 打印所有用例测试结果的计数统计 */
     return MT_EXIT_CODE;
 }

@@ -3,7 +3,7 @@ CC := gcc
 CFLAGS := -O1 -g -Wall -Wextra -Werror -std=c99
 LDFLAGS := -lm
 
-EXPECTED_RESULT := 8
+EXPECTED_RESULT := 9
 
 .PHONY: build
 build: $(TARGET)
@@ -23,5 +23,5 @@ test: build
 		exit 0; \
 	fi
 
-$(TARGET): $(TARGET).c
+$(TARGET): $(TARGET).c mintest.h
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)

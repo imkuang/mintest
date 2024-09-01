@@ -131,7 +131,23 @@ static char __mt_message_cache[MT_MESSAGE_MAX_LEN] = {0};
             __mt_testcase_run_status = 1;                          \
             return;                                                \
         }                                                          \
-    } while (0);
+    } while (0)
+
+/* 指针类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成固定格式的提示消息 */
+#define mt_assert_pointer_eq(expected, result)                              \
+    do                                                                      \
+    {                                                                       \
+        void *tmp_e = (expected);                                           \
+        void *tmp_r = (result);                                             \
+        if (tmp_e != tmp_r)                                                 \
+        {                                                                   \
+            (void)snprintf(__mt_message_cache, MT_MESSAGE_MAX_LEN,          \
+                           "%s:%d: expected result: %p, actual result: %p", \
+                           __FILE__, __LINE__, tmp_e, tmp_r);               \
+            __mt_testcase_run_status = 1;                                   \
+            return;                                                         \
+        }                                                                   \
+    } while (0)
 
 /* 整数类型结果检查，期望结果与实际结果不相等时测试失败，结束当前测试用例并并生成固定格式的提示消息 */
 #define mt_assert_int_eq(expected, result)                                  \
