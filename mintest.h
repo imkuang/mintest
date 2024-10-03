@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2024 Ming Kuang https://git.imkuang.com/imkuang/mintest
+ * Copyright (c) 2024 Ming Kuang <ming@imkuang.com>
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files
@@ -27,8 +27,11 @@
 /**
  * mintest.h - 一个简单、轻量化、在单个头文件内实现的 C 语言测试框架
  *
- * 复制本文件到项目中即可快速使用，具体使用示例可参考 mintest_example.c
- * 本文件中所有以 __ 开头的变量/宏定义均为框架内部使用定义，用户无需关注
+ * 项目地址：https://git.imkuang.com/imkuang/mintest
+ *
+ * 复制本文件到项目中并引用即可使用框架支持的全部测试定义和运行接口，具体使用
+ * 示例可参考 mintest_example.c 及源码注释（本文件中所有以 __ 开头的变量/宏
+ * 定义均为框架内部使用定义，用户无需关注）
  */
 
 #ifndef __MINTEST_H__
